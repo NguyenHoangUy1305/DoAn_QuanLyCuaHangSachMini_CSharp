@@ -1,0 +1,238 @@
+﻿
+-- =============================================
+-- CSDL: QuanLyCuaHangSachMini
+-- Script 1: CREATE TABLE
+-- =============================================
+
+IF DB_ID(N'QuanLyCuaHangSachMini') IS NULL
+BEGIN
+    CREATE DATABASE QuanLyCuaHangSachMini;
+END
+GO
+
+USE QuanLyCuaHangSachMini;
+GO
+
+-- Xóa bảng cũ nếu muốn tạo lại
+IF OBJECT_ID(N'dbo.NhatKyHeThong', N'U') IS NOT NULL DROP TABLE dbo.NhatKyHeThong;
+IF OBJECT_ID(N'dbo.HoaDon_ChiTiet', N'U') IS NOT NULL DROP TABLE dbo.HoaDon_ChiTiet;
+IF OBJECT_ID(N'dbo.PhieuNhap_ChiTiet', N'U') IS NOT NULL DROP TABLE dbo.PhieuNhap_ChiTiet;
+IF OBJECT_ID(N'dbo.HoaDon', N'U') IS NOT NULL DROP TABLE dbo.HoaDon;
+IF OBJECT_ID(N'dbo.PhieuNhap', N'U') IS NOT NULL DROP TABLE dbo.PhieuNhap;
+IF OBJECT_ID(N'dbo.Sach', N'U') IS NOT NULL DROP TABLE dbo.Sach;
+IF OBJECT_ID(N'dbo.KhachHang', N'U') IS NOT NULL DROP TABLE dbo.KhachHang;
+IF OBJECT_ID(N'dbo.NhanVien', N'U') IS NOT NULL DROP TABLE dbo.NhanVien;
+IF OBJECT_ID(N'dbo.NhaXuatBan', N'U') IS NOT NULL DROP TABLE dbo.NhaXuatBan;
+IF OBJECT_ID(N'dbo.NhaCungCap', N'U') IS NOT NULL DROP TABLE dbo.NhaCungCap;
+IF OBJECT_ID(N'dbo.TheLoai', N'U') IS NOT NULL DROP TABLE dbo.TheLoai;
+GO
+
+CREATE TABLE dbo.TheLoai
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaTheLoai NVARCHAR(10) NOT NULL,
+    TenTheLoai NVARCHAR(100) NOT NULL,
+    MoTa NVARCHAR(500) NULL
+);
+GO
+
+CREATE TABLE dbo.NhaCungCap
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaNhaCungCap NVARCHAR(10) NOT NULL,
+    TenNhaCungCap NVARCHAR(150) NOT NULL,
+    DienThoai VARCHAR(10) NULL,
+    Email VARCHAR(100) NULL,
+    DiaChi NVARCHAR(255) NULL
+);
+GO
+
+CREATE TABLE dbo.NhaXuatBan
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaNhaXuatBan NVARCHAR(10) NOT NULL,
+    TenNhaXuatBan NVARCHAR(150) NOT NULL,
+    DienThoai VARCHAR(10) NULL,
+    Email VARCHAR(100) NULL,
+    DiaChi NVARCHAR(255) NULL
+);
+GO
+
+CREATE TABLE dbo.NhanVien
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaNhanVien NVARCHAR(10) NOT NULL,
+    HoVaTen NVARCHAR(150) NOT NULL,
+    DienThoai VARCHAR(10) NULL,
+    DiaChi NVARCHAR(255) NULL,
+    TenDangNhap VARCHAR(50) NOT NULL,
+    MatKhau NVARCHAR(255) NOT NULL,
+    QuyenHan BIT NOT NULL DEFAULT(0),      -- 1 = admin, 0 = nhanvien
+    KichHoat BIT NOT NULL DEFAULT(1)
+);
+GO
+
+CREATE TABLE dbo.KhachHang
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaKhachHang NVARCHAR(10) NOT NULL,
+    HoVaTen NVARCHAR(150) NOT NULL,
+    DienThoai VARCHAR(10) NULL,
+    DiaChi NVARCHAR(255) NULL,
+    Email VARCHAR(100) NULL
+);
+GO
+
+CREATE TABLE dbo.Sach
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    TheLoaiID INT NOT NULL,
+    NhaXuatBanID INT NOT NULL,
+    MaSach NVARCHAR(10) NOT NULL,
+    TenSach NVARCHAR(200) NOT NULL,
+    TacGia NVARCHAR(150) NOT NULL,
+    NamXuatBan INT NOT NULL,
+    GiaNhap DECIMAL(18,2) NOT NULL DEFAULT(0),
+    GiaBan DECIMAL(18,2) NOT NULL DEFAULT(0),
+    SoLuongTon INT NOT NULL DEFAULT(0),
+    HinhAnh NVARCHAR(255) NULL,
+    MoTa NVARCHAR(1000) NULL,
+    TrangThai NVARCHAR(50) NOT NULL DEFAULT(N'Còn hàng')
+);
+GO
+
+CREATE TABLE dbo.PhieuNhap
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    NhaCungCapID INT NOT NULL,
+    NhanVienID INT NOT NULL,
+    MaPhieuNhap NVARCHAR(10) NOT NULL,
+    NgayNhap DATETIME NOT NULL DEFAULT(GETDATE()),
+    GhiChuPhieuNhap NVARCHAR(500) NULL
+);
+GO
+
+CREATE TABLE dbo.PhieuNhap_ChiTiet
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    PhieuNhapID INT NOT NULL,
+    SachID INT NOT NULL,
+    SoLuongNhap INT NOT NULL,
+    DonGiaNhap DECIMAL(18,2) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.HoaDon
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    NhanVienID INT NOT NULL,
+    KhachHangID INT NOT NULL,
+    MaHoaDon NVARCHAR(10) NOT NULL,
+    NgayLap DATETIME NOT NULL DEFAULT(GETDATE()),
+    GhiChuHoaDon NVARCHAR(500) NULL
+);
+GO
+
+CREATE TABLE dbo.HoaDon_ChiTiet
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    HoaDonID INT NOT NULL,
+    SachID INT NOT NULL,
+    SoLuongBan INT NOT NULL,
+    DonGiaBan DECIMAL(18,2) NOT NULL
+);
+GO
+
+CREATE TABLE dbo.NhatKyHeThong
+(
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    NhanVienID INT NULL,
+    ThoiGian DATETIME NOT NULL DEFAULT(GETDATE()),
+    HanhDong NVARCHAR(50) NOT NULL,
+    BangDuLieu NVARCHAR(100) NOT NULL,
+    KhoaChinh NVARCHAR(50) NULL,
+    MoTa NVARCHAR(1000) NULL,
+    TenDangNhap NVARCHAR(50) NULL,
+    HoVaTen NVARCHAR(150) NULL,
+    VaiTro NVARCHAR(50) NULL
+);
+GO
+
+-- Unique
+CREATE UNIQUE INDEX UX_TheLoai_MaTheLoai ON dbo.TheLoai(MaTheLoai);
+CREATE UNIQUE INDEX UX_NhaCungCap_MaNhaCungCap ON dbo.NhaCungCap(MaNhaCungCap);
+CREATE UNIQUE INDEX UX_NhaXuatBan_MaNhaXuatBan ON dbo.NhaXuatBan(MaNhaXuatBan);
+CREATE UNIQUE INDEX UX_Sach_MaSach ON dbo.Sach(MaSach);
+CREATE UNIQUE INDEX UX_NhanVien_MaNhanVien ON dbo.NhanVien(MaNhanVien);
+CREATE UNIQUE INDEX UX_NhanVien_TenDangNhap ON dbo.NhanVien(TenDangNhap);
+CREATE UNIQUE INDEX UX_KhachHang_MaKhachHang ON dbo.KhachHang(MaKhachHang);
+CREATE UNIQUE INDEX UX_HoaDon_MaHoaDon ON dbo.HoaDon(MaHoaDon);
+CREATE UNIQUE INDEX UX_PhieuNhap_MaPhieuNhap ON dbo.PhieuNhap(MaPhieuNhap);
+GO
+
+-- Foreign key
+ALTER TABLE dbo.Sach
+ADD CONSTRAINT FK_Sach_TheLoai
+FOREIGN KEY (TheLoaiID) REFERENCES dbo.TheLoai(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.Sach
+ADD CONSTRAINT FK_Sach_NhaXuatBan
+FOREIGN KEY (NhaXuatBanID) REFERENCES dbo.NhaXuatBan(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.HoaDon
+ADD CONSTRAINT FK_HoaDon_NhanVien
+FOREIGN KEY (NhanVienID) REFERENCES dbo.NhanVien(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.HoaDon
+ADD CONSTRAINT FK_HoaDon_KhachHang
+FOREIGN KEY (KhachHangID) REFERENCES dbo.KhachHang(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.HoaDon_ChiTiet
+ADD CONSTRAINT FK_HoaDon_ChiTiet_HoaDon
+FOREIGN KEY (HoaDonID) REFERENCES dbo.HoaDon(ID)
+ON DELETE CASCADE ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.HoaDon_ChiTiet
+ADD CONSTRAINT FK_HoaDon_ChiTiet_Sach
+FOREIGN KEY (SachID) REFERENCES dbo.Sach(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.PhieuNhap
+ADD CONSTRAINT FK_PhieuNhap_NhaCungCap
+FOREIGN KEY (NhaCungCapID) REFERENCES dbo.NhaCungCap(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.PhieuNhap
+ADD CONSTRAINT FK_PhieuNhap_NhanVien
+FOREIGN KEY (NhanVienID) REFERENCES dbo.NhanVien(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.PhieuNhap_ChiTiet
+ADD CONSTRAINT FK_PhieuNhap_ChiTiet_PhieuNhap
+FOREIGN KEY (PhieuNhapID) REFERENCES dbo.PhieuNhap(ID)
+ON DELETE CASCADE ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.PhieuNhap_ChiTiet
+ADD CONSTRAINT FK_PhieuNhap_ChiTiet_Sach
+FOREIGN KEY (SachID) REFERENCES dbo.Sach(ID)
+ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+ALTER TABLE dbo.NhatKyHeThong
+ADD CONSTRAINT FK_NhatKyHeThong_NhanVien
+FOREIGN KEY (NhanVienID) REFERENCES dbo.NhanVien(ID)
+ON DELETE SET NULL ON UPDATE NO ACTION;
+GO

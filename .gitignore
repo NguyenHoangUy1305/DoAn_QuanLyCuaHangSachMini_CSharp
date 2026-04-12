@@ -1,0 +1,7 @@
+# Visual Studio Build and Cache
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.log\n
